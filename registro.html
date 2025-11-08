@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registro</title>
+    <style>
+        body {
+            background-color: #F4F5F6;
+            font-family: Arial, Helvetica, sans-serif;
+        }
+
+
+        .form {
+            display: flex;
+            flex-direction: column;
+            max-width: 400px;
+            margin: 0 auto;
+        }
+
+
+        .form label {
+            margin-bottom: 5px;
+            font-family: 'Times New Roman', Times, serif;
+        }
+
+
+        .form input,
+        .form select {
+            margin-bottom: 15px;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+
+        .form button {
+            padding: 10px;
+            background-color: #289fa7;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+
+        .form button:hover {
+            background-color:#6698F7;
+        }
+
+        .nav-buttons {
+            display: flex;
+            gap: 10px;
+            max-width: 400px;
+            margin: 20px auto 0;
+            flex-wrap: wrap;
+        }
+
+        .nav-btn {
+            flex: 1;
+            min-width: 80px;
+            padding: 10px;
+            background-color: #289fa7;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            text-decoration: none;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        .nav-btn:hover {
+            background-color: #6698F7;
+        }
+    </style>
+</head>
+
+
+<body>
+    <div class="form">
+        <label for="Identificacion">Identificacion</label>
+        <input type="text" id="Identificacion">
+        <label for="Nombre">Nombre</label>
+        <input type="text" id="Nombre">
+        <label for="Apellidos">Apellidos</label>
+        <input type="text" id="Apellidos">
+        <label for="email">Email</label>
+        <input type="text" id="email">
+        <label for="Sexo">Sexo</label>
+        <select id="Sexo">
+            <option value="Masculino">Masculino</option>
+            <option value="Femenino">Femenino</option>
+        </select>
+        <label for="tipo">Tipo</label>
+        <select name="tipo" id="tipo">
+            <option value="Estudiante">Estudiante</option>
+            <option value="Profesor">Profesor</option>
+        </select>
+        <button type="submit" onclick="guardar()">Guardar</button>
+    </div>
+
+    <div class="nav-buttons">
+        <a href="listado.html" class="nav-btn">Listado</a>
+        <a href="buscar.html" class="nav-btn">Buscar</a>
+        <a href="actualizar.html" class="nav-btn">Actualizar</a>
+    </div>
+</body>
+<script>
+    let personas = [];
+
+    window.onload = function() {
+        const datosGuardados = localStorage.getItem("personas");
+        if (datosGuardados) {
+            personas = JSON.parse(datosGuardados);
+        }
+    };
+
+    function guardar(){
+        let persona = {
+            identificacion: document.getElementById("Identificacion").value,
+            nombre: document.getElementById("Nombre").value,
+            apellidos: document.getElementById("Apellidos").value,
+            email: document.getElementById("email").value,
+            sexo: document.getElementById("Sexo").value,
+            tipo: document.getElementById("tipo").value
+        };
+        personas.push(persona);
+        localStorage.setItem("personas", JSON.stringify(personas));
+        alert("Datos guardados correctamente");
+        limpiarFormulario();
+    }
+
+
+    function limpiarFormulario(){
+        document.getElementById("Identificacion").value = "";
+        document.getElementById("Nombre").value = "";
+        document.getElementById("Apellidos").value = "";
+        document.getElementById("email").value = "";
+        document.getElementById("Sexo").value = "Masculino";
+        document.getElementById("tipo").value = "Estudiante";
+    }
+</script>
+</html>

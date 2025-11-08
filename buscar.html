@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Buscar Personas</title>
+    <style>
+        body {
+            background-color: #F4F5F6;
+            font-family: Arial, Helvetica, sans-serif;
+            padding: 20px;
+        }
+
+        h1 {
+            text-align: center;
+            color: #289fa7;
+            font-family: 'Times New Roman', Times, serif;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .search-section {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .search-section input,
+        .search-section select {
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        .search-section input {
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .search-section select {
+            min-width: 150px;
+        }
+
+        .search-section button {
+            padding: 10px 20px;
+            background-color: #289fa7;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .search-section button:hover {
+            background-color: #6698F7;
+        }
+
+        .btn-limpiar {
+            background-color: #6c757d;
+            padding: 10px 15px;
+        }
+
+        .btn-limpiar:hover {
+            background-color: #5a6268;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        table thead {
+            background-color: #289fa7;
+            color: white;
+        }
+
+        table th,
+        table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        table tbody tr:hover {
+            background-color: #f5f5f5;
+        }
+
+        .no-data {
+            text-align: center;
+            padding: 20px;
+            color: #666;
+            font-style: italic;
+        }
+
+        .btn-container {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            background-color: #289fa7;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            margin: 0 5px;
+        }
+
+        .btn:hover {
+            background-color: #6698F7;
+        }
+
+        .resultado-info {
+            background-color: #e8f4f8;
+            padding: 10px 15px;
+            border-radius: 4px;
+            margin-top: 10px;
+            color: #289fa7;
+            font-weight: bold;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>Buscar Personas</h1>
+
+        <div class="search-section">
+            <select id="tipo-busqueda">
+                <option value="identificacion">Buscar por Identificación</option>
+                <option value="nombre">Buscar por Nombre</option>
+                <option value="apellidos">Buscar por Apellido</option>
+                <option value="email">Buscar por Email</option>
+            </select>
+
+            <input 
+                type="text" 
+                id="parametro-busqueda" 
+                placeholder="Ingresa el parámetro de búsqueda"
+            >
+
+            <button onclick="buscar()">Buscar</button>
+            <button class="btn-limpiar" onclick="limpiarBusqueda()">Limpiar</button>
+        </div>
+
+        <div id="resultado-info"></div>
+
+        <div id="tabla-container">
+            <table id="tabla-personas">
+                <thead>
+                    <tr>
+                        <th>Identificación</th>
+                        <th>Nombre</th>
+                        <th>Apellidos</th>
+                        <th>Email</th>
+                        <th>Sexo</th>
+                        <th>Tipo</th>
+                    </tr>
+                </thead>
+                <tbody id="tbody-personas">
+                </tbody>
+            </table>
+        </div>
+
+        <div class="btn-container">
+            <a href="registro.html" class="btn">Ir al Registro</a>
+            <a href="listado.html" class="btn">Ver Listado Completo</a>
+        </div>
+    </div>
+
+    <script>
+        let personasCompletas = [];
+
+        window.onload = function() {
+            cargarDatos();
+        };
+
+        function cargarDatos() {
+            const datosGuardados = localStorage.getItem("personas");
+            
+            if (datosGuardados) {
+                personasCompletas = JSON.parse(datosGuardados);
+            } else {
+                personasCompletas = [];
+            }
+
+            mostrarTodasLasPersonas();
+        }
+
+        function mostrarTodasLasPersonas() {
+            const tbody = document.getElementById("tbody-personas");
+            const resultadoInfo = document.getElementById("resultado-info");
+            
+            tbody.innerHTML = "";
+            resultadoInfo.innerHTML = "";
+
+            if (personasCompletas.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" class="no-data">No hay datos registrados</td></tr>';
+            } else {
+                personasCompletas.forEach((persona) => {
+                    agregarFilaATabla(persona);
+                });
+                resultadoInfo.innerHTML = `Se encontraron <strong>${personasCompletas.length}</strong> registros.`;
+            }
+        }
+
+        function buscar() {
+            const tipoBusqueda = document.getElementById("tipo-busqueda").value;
+            const parametroBusqueda = document.getElementById("parametro-busqueda").value.trim().toLowerCase();
+
+            if (parametroBusqueda === "") {
+                alert("Por favor ingresa un parámetro de búsqueda");
+                return;
+            }
+
+            const resultados = personasCompletas.filter((persona) => {
+                const valor = persona[tipoBusqueda].toString().toLowerCase();
+                return valor.includes(parametroBusqueda);
+            });
+
+            mostrarResultados(resultados, tipoBusqueda, parametroBusqueda);
+        }
+
+        function mostrarResultados(resultados, tipoBusqueda, parametroBusqueda) {
+            const tbody = document.getElementById("tbody-personas");
+            const resultadoInfo = document.getElementById("resultado-info");
+
+            tbody.innerHTML = "";
+            resultadoInfo.innerHTML = "";
+
+            const tipoNombre = {
+                'identificacion': 'Identificación',
+                'nombre': 'Nombre',
+                'apellidos': 'Apellido',
+                'email': 'Email'
+            };
+
+            if (resultados.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="6" class="no-data">No se encontraron resultados para: <strong>${parametroBusqueda}</strong> por ${tipoNombre[tipoBusqueda]}</td></tr>`;
+                resultadoInfo.innerHTML = `<div class="resultado-info">Se encontraron <strong>0</strong> registros.</div>`;
+            } else {
+                resultados.forEach((persona) => {
+                    agregarFilaATabla(persona);
+                });
+                resultadoInfo.innerHTML = `<div class="resultado-info">Se encontraron <strong>${resultados.length}</strong> registros que coinciden con tu búsqueda en ${tipoNombre[tipoBusqueda]}.</div>`;
+            }
+        }
+
+        function agregarFilaATabla(persona) {
+            const tbody = document.getElementById("tbody-personas");
+            const fila = document.createElement("tr");
+
+            fila.innerHTML = `
+                <td>${persona.identificacion}</td>
+                <td>${persona.nombre}</td>
+                <td>${persona.apellidos}</td>
+                <td>${persona.email}</td>
+                <td>${persona.sexo}</td>
+                <td>${persona.tipo}</td>
+            `;
+
+            tbody.appendChild(fila);
+        }
+
+        function limpiarBusqueda() {
+            document.getElementById("parametro-busqueda").value = "";
+            document.getElementById("tipo-busqueda").value = "identificacion";
+            mostrarTodasLasPersonas();
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById("parametro-busqueda").addEventListener("keypress", function(event) {
+                if (event.key === "Enter") {
+                    buscar();
+                }
+            });
+        });
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,642 @@
+<!DOCTYPE html>
+<html lang="en">
+
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Actualizar Personas</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+
+        body {
+            background-color: #F4F5F6;
+            font-family: Arial, Helvetica, sans-serif;
+            padding: 20px;
+        }
+
+
+        h1 {
+            text-align: center;
+            color: #289fa7;
+            font-family: 'Times New Roman', Times, serif;
+            margin-bottom: 20px;
+        }
+
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+
+        .search-section {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+
+        .search-section input {
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            flex: 1;
+            min-width: 200px;
+            font-size: 14px;
+        }
+
+
+        .search-section button {
+            padding: 10px 20px;
+            background-color: #289fa7;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+
+        .search-section button:hover {
+            background-color: #6698F7;
+        }
+
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+
+        table thead {
+            background-color: #289fa7;
+            color: white;
+        }
+
+
+        table th,
+        table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+
+        table tbody tr:hover {
+            background-color: #f5f5f5;
+        }
+
+
+        .acciones {
+            display: flex;
+            gap: 8px;
+        }
+
+
+        .btn-editar,
+        .btn-eliminar {
+            padding: 6px 12px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+
+        .btn-editar {
+            background-color: #007bff;
+            color: white;
+        }
+
+
+        .btn-editar:hover {
+            background-color: #0056b3;
+        }
+
+
+        .btn-eliminar {
+            background-color: #dc3545;
+            color: white;
+        }
+
+
+        .btn-eliminar:hover {
+            background-color: #c82333;
+        }
+
+
+        .no-data {
+            text-align: center;
+            padding: 20px;
+            color: #666;
+            font-style: italic;
+        }
+
+
+        /* Modal de edición */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.4);
+            overflow: auto;
+            animation: fadeIn 0.3s;
+        }
+
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+
+        @keyframes slideIn {
+            from {
+                transform: translateY(-50px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+
+        .modal-content {
+            background-color: white;
+            margin: 2% auto;
+            padding: 20px;
+            border-radius: 8px;
+            width: 500px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            animation: slideIn 0.3s;
+        }
+
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            border-bottom: 2px solid #289fa7;
+            padding-bottom: 10px;
+        }
+
+
+        .modal-header h2 {
+            color: #289fa7;
+            font-family: 'Times New Roman', Times, serif;
+            font-size: 20px;
+        }
+
+
+        .close {
+            font-size: 28px;
+            font-weight: bold;
+            color: #aaa;
+            cursor: pointer;
+        }
+
+
+        .close:hover {
+            color: #000;
+        }
+
+
+        .form-group {
+            margin-bottom: 12px;
+        }
+
+
+        .form-group label {
+            display: block;
+            margin-bottom: 4px;
+            font-weight: bold;
+            color: #333;
+            font-family: 'Times New Roman', Times, serif;
+            font-size: 13px;
+        }
+
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 13px;
+            font-family: Arial, sans-serif;
+        }
+
+
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #289fa7;
+            box-shadow: 0 0 5px rgba(40, 159, 167, 0.3);
+        }
+
+
+        .modal-buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+            margin-top: 15px;
+        }
+
+
+        .btn-guardar,
+        .btn-cancelar {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 13px;
+        }
+
+
+        .btn-guardar {
+            background-color: #289fa7;
+            color: white;
+        }
+
+
+        .btn-guardar:hover {
+            background-color: #6698F7;
+        }
+
+
+        .btn-cancelar {
+            background-color: #6c757d;
+            color: white;
+        }
+
+
+        .btn-cancelar:hover {
+            background-color: #5a6268;
+        }
+
+
+        .btn-container {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+
+        .btn {
+            padding: 10px 20px;
+            background-color: #289fa7;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            margin: 0 5px;
+        }
+
+
+        .btn:hover {
+            background-color: #6698F7;
+        }
+
+
+        .resultado-info {
+            background-color: #e8f4f8;
+            padding: 10px 15px;
+            border-radius: 4px;
+            margin-top: 10px;
+            color: #289fa7;
+            font-weight: bold;
+        }
+    </style>
+</head>
+
+
+<body>
+    <div class="container">
+        <h1>Actualizar Personas</h1>
+
+
+        <div class="search-section">
+            <input type="text" id="busqueda-identificacion" placeholder="Buscar por identificación para editar...">
+            <button onclick="buscarPorIdentificacion()">Buscar</button>
+            <button onclick="mostrarTodos()" style="background-color: #6c757d;">Ver Todos</button>
+        </div>
+
+
+        <div id="resultado-info"></div>
+
+
+        <div id="tabla-container">
+            <table id="tabla-personas">
+                <thead>
+                    <tr>
+                        <th>Identificación</th>
+                        <th>Nombre</th>
+                        <th>Apellidos</th>
+                        <th>Email</th>
+                        <th>Sexo</th>
+                        <th>Tipo</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody id="tbody-personas">
+                </tbody>
+            </table>
+        </div>
+
+
+        <div class="btn-container">
+            <a href="registro.html" class="btn">Ir al Registro</a>
+            <a href="listado.html" class="btn">Ver Listado Completo</a>
+            <a href="buscar.html" class="btn">Buscar</a>
+        </div>
+    </div>
+
+
+    <div id="modal-editar" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Editar Persona</h2>
+                <span class="close" onclick="cerrarModal()">&times;</span>
+            </div>
+
+
+            <form id="formulario-editar">
+                <div class="form-group">
+                    <label for="edit-identificacion">Identificación (no editable)</label>
+                    <input type="text" id="edit-identificacion" disabled>
+                </div>
+
+
+                <div class="form-group">
+                    <label for="edit-nombre">Nombre</label>
+                    <input type="text" id="edit-nombre" required>
+                </div>
+
+
+                <div class="form-group">
+                    <label for="edit-apellidos">Apellidos</label>
+                    <input type="text" id="edit-apellidos" required>
+                </div>
+
+
+                <div class="form-group">
+                    <label for="edit-email">Email</label>
+                    <input type="email" id="edit-email" required>
+                </div>
+
+
+                <div class="form-group">
+                    <label for="edit-sexo">Sexo</label>
+                    <select id="edit-sexo" required>
+                        <option value="Masculino">Masculino</option>
+                        <option value="Femenino">Femenino</option>
+                    </select>
+                </div>
+
+
+                <div class="form-group">
+                    <label for="edit-tipo">Tipo</label>
+                    <select id="edit-tipo" required>
+                        <option value="Estudiante">Estudiante</option>
+                        <option value="Profesor">Profesor</option>
+                    </select>
+                </div>
+
+
+                <div class="modal-buttons">
+                    <button type="button" class="btn-cancelar" onclick="cerrarModal()">Cancelar</button>
+                    <button type="button" class="btn-guardar" onclick="guardarCambios()">Guardar Cambios</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+
+    <script>
+        let personasCompletas = [];
+        let indiceEditando = null;
+
+
+        window.onload = function () {
+            cargarDatos();
+            mostrarTodos();
+        };
+
+
+        function cargarDatos() {
+            const datosGuardados = localStorage.getItem("personas");
+
+
+            if (datosGuardados) {
+                personasCompletas = JSON.parse(datosGuardados);
+            } else {
+                personasCompletas = [];
+            }
+        }
+
+
+        function mostrarTodos() {
+            const tbody = document.getElementById("tbody-personas");
+            const resultadoInfo = document.getElementById("resultado-info");
+
+
+            tbody.innerHTML = "";
+            resultadoInfo.innerHTML = "";
+
+
+            if (personasCompletas.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="7" class="no-data">No hay datos registrados</td></tr>';
+            } else {
+                personasCompletas.forEach((persona, index) => {
+                    agregarFilaATabla(persona, index);
+                });
+                resultadoInfo.innerHTML = `<div class="resultado-info">Total de registros: <strong>${personasCompletas.length}</strong></div>`;
+            }
+
+
+            document.getElementById("busqueda-identificacion").value = "";
+        }
+
+
+        function buscarPorIdentificacion() {
+            const busqueda = document.getElementById("busqueda-identificacion").value.trim().toLowerCase();
+
+
+            if (busqueda === "") {
+                alert("Por favor ingresa una identificación");
+                return;
+            }
+
+
+            const resultados = personasCompletas.filter((persona) => {
+                return persona.identificacion.toLowerCase().includes(busqueda);
+            });
+
+
+            mostrarResultadosBusqueda(resultados);
+        }
+
+
+        function mostrarResultadosBusqueda(resultados) {
+            const tbody = document.getElementById("tbody-personas");
+            const resultadoInfo = document.getElementById("resultado-info");
+
+
+            tbody.innerHTML = "";
+            resultadoInfo.innerHTML = "";
+
+
+            if (resultados.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="7" class="no-data">No se encontraron resultados</td></tr>`;
+            } else {
+                resultados.forEach((persona, index) => {
+                    const indiceReal = personasCompletas.findIndex(p => p.identificacion === persona.identificacion);
+                    agregarFilaATabla(persona, indiceReal);
+                });
+                resultadoInfo.innerHTML = `<div class="resultado-info">Se encontraron <strong>${resultados.length}</strong> registros.</div>`;
+            }
+        }
+
+
+        function agregarFilaATabla(persona, index) {
+            const tbody = document.getElementById("tbody-personas");
+            const fila = document.createElement("tr");
+
+
+            fila.innerHTML = `
+                <td>${persona.identificacion}</td>
+                <td>${persona.nombre}</td>
+                <td>${persona.apellidos}</td>
+                <td>${persona.email}</td>
+                <td>${persona.sexo}</td>
+                <td>${persona.tipo}</td>
+                <td>
+                    <div class="acciones">
+                        <button class="btn-editar" onclick="abrirModalEditar(${index})">Editar</button>
+                        <button class="btn-eliminar" onclick="eliminarPersona(${index})">Eliminar</button>
+                    </div>
+                </td>
+            `;
+
+
+            tbody.appendChild(fila);
+        }
+
+
+        function abrirModalEditar(index) {
+            indiceEditando = index;
+            const persona = personasCompletas[index];
+
+
+            document.getElementById("edit-identificacion").value = persona.identificacion;
+            document.getElementById("edit-nombre").value = persona.nombre;
+            document.getElementById("edit-apellidos").value = persona.apellidos;
+            document.getElementById("edit-email").value = persona.email;
+            document.getElementById("edit-sexo").value = persona.sexo;
+            document.getElementById("edit-tipo").value = persona.tipo;
+
+
+            document.getElementById("modal-editar").style.display = "block";
+        }
+
+
+        function cerrarModal() {
+            document.getElementById("modal-editar").style.display = "none";
+            indiceEditando = null;
+        }
+
+
+        function guardarCambios() {
+            if (indiceEditando === null) {
+                alert("Error al guardar");
+                return;
+            }
+
+
+            const nombre = document.getElementById("edit-nombre").value.trim();
+            const apellidos = document.getElementById("edit-apellidos").value.trim();
+            const email = document.getElementById("edit-email").value.trim();
+            const sexo = document.getElementById("edit-sexo").value;
+            const tipo = document.getElementById("edit-tipo").value;
+
+
+            if (nombre === "" || apellidos === "" || email === "") {
+                alert("Por favor completa todos los campos obligatorios");
+                return;
+            }
+
+
+            personasCompletas[indiceEditando] = {
+                ...personasCompletas[indiceEditando],
+                nombre: nombre,
+                apellidos: apellidos,
+                email: email,
+                sexo: sexo,
+                tipo: tipo
+            };
+
+
+            localStorage.setItem("personas", JSON.stringify(personasCompletas));
+
+
+            alert("Cambios guardados correctamente");
+            cerrarModal();
+            mostrarTodos();
+        }
+
+
+        function eliminarPersona(index) {
+            const persona = personasCompletas[index];
+
+
+            if (confirm(`¿Estás seguro de que deseas eliminar a ${persona.nombre} ${persona.apellidos}?`)) {
+                personasCompletas.splice(index, 1);
+                localStorage.setItem("personas", JSON.stringify(personasCompletas));
+                alert("Persona eliminada correctamente");
+                mostrarTodos();
+            }
+        }
+
+
+        window.onclick = function (event) {
+            const modal = document.getElementById("modal-editar");
+            if (event.target === modal) {
+                cerrarModal();
+            }
+        };
+
+
+        document.addEventListener('DOMContentLoaded', function () {
+            document.getElementById("busqueda-identificacion").addEventListener("keypress", function (event) {
+                if (event.key === "Enter") {
+                    buscarPorIdentificacion();
+                }
+            });
+        });
+    </script>
+</body>
+
+
+</html>

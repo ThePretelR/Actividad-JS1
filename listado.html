@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Listado de Personas</title>
+    <style>
+        body {
+            background-color: #F4F5F6;
+            font-family: Arial, Helvetica, sans-serif;
+            padding: 20px;
+        }
+
+        h1 {
+            text-align: center;
+            color: #289fa7;
+            font-family: 'Times New Roman', Times, serif;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        table thead {
+            background-color: #289fa7;
+            color: white;
+        }
+
+        table th,
+        table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        table tbody tr:hover {
+            background-color: #f5f5f5;
+        }
+
+        .no-data {
+            text-align: center;
+            padding: 20px;
+            color: #666;
+            font-style: italic;
+        }
+
+        .btn-container {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            background-color: #289fa7;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            margin: 0 5px;
+        }
+
+        .btn:hover {
+            background-color: #6698F7;
+        }
+
+        .btn-danger {
+            background-color: #dc3545;
+        }
+
+        .btn-danger:hover {
+            background-color: #c82333;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>Listado de Personas Registradas</h1>
+        
+        <div id="tabla-container">
+            <table id="tabla-personas">
+                <thead>
+                    <tr>
+                        <th>Identificación</th>
+                        <th>Nombre</th>
+                        <th>Apellidos</th>
+                        <th>Email</th>
+                        <th>Sexo</th>
+                        <th>Tipo</th>
+                    </tr>
+                </thead>
+                <tbody id="tbody-personas">
+                </tbody>
+            </table>
+        </div>
+
+        <div class="btn-container">
+            <a href="registro.html" class="btn">Volver al Registro</a>
+        </div>
+    </div>
+
+    <script>
+        function cargarDatos() {
+            const datosGuardados = localStorage.getItem("personas");
+            
+            let personas = [];
+            if (datosGuardados) {
+                personas = JSON.parse(datosGuardados);
+            }
+
+            const tbody = document.getElementById("tbody-personas");
+            tbody.innerHTML = "";
+
+            if (personas.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" class="no-data">No hay datos registrados</td></tr>';
+            } else {
+                personas.forEach((persona) => {
+                    const fila = document.createElement("tr");
+                    
+                    fila.innerHTML = `
+                        <td>${persona.identificacion}</td>
+                        <td>${persona.nombre}</td>
+                        <td>${persona.apellidos}</td>
+                        <td>${persona.email}</td>
+                        <td>${persona.sexo}</td>
+                        <td>${persona.tipo}</td>
+                    `;
+                    
+                    tbody.appendChild(fila);
+                });
+            }
+        }
+
+        window.onload = cargarDatos;
+    </script>
+</body>
+
+</html>
